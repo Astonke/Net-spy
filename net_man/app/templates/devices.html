@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NET-SPY</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center" style='font-size:50px'>NET-SPY</h1>
+        
+        <div class="text-center mb-4">
+            <form method="POST" class="d-inline">
+                {% csrf_token %}
+                {% if monitoring_state == "Stopped" %}
+                <button type="submit" name="action" value="arm" class="btn btn-success">Arm Monitoring</button>
+                {% else %}
+                <button type="submit" name="action" value="disarm" class="btn btn-danger">Disarm Monitoring</button>
+                {% endif %}
+            </form>
+            <p class="mt-2">Monitoring Status: <strong>{{ monitoring_state }}</strong></p>
+        </div>
+
+        <form method="POST" class="mb-4">
+            {% csrf_token %}
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" name="ip" class="form-control" placeholder="IP Address" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="description" class="form-control" placeholder="Description" required>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" name="action" value="add" class="btn btn-primary w-100">Add Device</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>IP Address</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for device in devices %}
+                <tr>
+                    <td>{{ device.0 }}</td>
+                    <td>{{ device.1 }}</td>
+                    <td>{{ device.2 }}</td>
+                    <td>
+                        <form method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="ip" value="{{ device.0 }}">
+                            <input type="hidden" name="description" value="{{ device.1 }}">
+                            {% if device.2 == 'enabled' %}
+                            <button type="submit" name="action" value="disable" class="btn btn-warning">Disable</button>
+                            {% else %}
+                            <button type="submit" name="action" value="enable" class="btn btn-success">Enable</button>
+                            {% endif %}
+                            <button type="submit" name="action" value="remove" class="btn btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
